@@ -154,15 +154,26 @@ const ImageGallery: React.FC = () => {
   const handleSaveEdit = async () => {
     if (!editId) return;
 
-    await editImage(editId, editTitle);
+    try {
+      const res = await editImage(editId, editTitle);
 
-    setImages((prev) =>
-      prev.map((img) =>
-        img._id === editId ? { ...img, title: editTitle } : img,
-      ),
-    );
+      if (!res.data.success) {
+        toast.error(res.data.message);
+        return;
+      }
 
-    closeModal();
+      setImages((prev) =>
+        prev.map((img) =>
+          img._id === editId ? { ...img, title: editTitle } : img,
+        ),
+      );
+
+      toast.success("Image updated");
+      closeModal();
+    } catch (err) {
+      console.log(err);
+      toast.error("Edit failed");
+    }
   };
 
   const openEditModal = (img: ImageItem) => {
@@ -187,15 +198,26 @@ const ImageGallery: React.FC = () => {
     setIsDeleteModalOpen(false);
   };
 
-  const confirmDelete = async () => {
-    if (!deleteId) return;
+const confirmDelete = async () => {
+  if (!deleteId) return;
 
-    await deleteImage(deleteId);
+  try {
+    const res = await deleteImage(deleteId);
+
+    if (!res.data.success) {
+      toast.error(res.data.message);
+      return;
+    }
 
     setImages((prev) => prev.filter((img) => img._id !== deleteId));
 
+    toast.success("Image deleted");
     closeDeleteModal();
-  };
+  } catch (err) {
+    console.log(err);
+    toast.error("Delete failed");
+  }
+};
 
   return (
     <div className="gallery-container">

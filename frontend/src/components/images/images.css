@@ -166,6 +166,18 @@
   color: #333;
 }
 
+.img {
+  user-select: none;
+  pointer-events: none;
+}
+
+.img {
+  cursor: grab;
+}
+.img:active {
+  cursor: grabbing;
+}
+
 
 .img-actions {
   display: flex;

@@ -1,7 +1,7 @@
 
 export const mapImagesToDto = (images: any[]): ImageDto[] => {
   return images.map((image) => ({
-    id: image._id.toString(),
+    _id: image._id.toString(),
     title: image.title,
     image: image.image,
     order: image.order
@@ -9,7 +9,7 @@ export const mapImagesToDto = (images: any[]): ImageDto[] => {
 };
 
 export interface ImageDto {
-  id: string;
+  _id: string;
   title: string;
   image: string;
   order: number;

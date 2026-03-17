@@ -82,6 +82,8 @@ export const deleteImage = (id: string) => {
 };
 
 export const editImage = (id: string, title: string) => {
+    console.log(title,'asdlkfhalsdkjfh');
+    
   return api.put(`/imageEdit/${id}`, { title });
 };
 

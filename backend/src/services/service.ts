@@ -52,7 +52,7 @@ export class Service {
       }
 
       const otp = generateOtp();
-      const defaultEmail = "albertjpaul@gmail.com";
+      const defaultEmail = email;
       await sendOtp(defaultEmail, otp);
 
       otpStore.set(email, {
@@ -116,7 +116,7 @@ export class Service {
         return { success: false };
       }
 
-      const defaultEmail = "albertjpaul@gmail.com";
+      const defaultEmail = email;
       await sendOtp(defaultEmail, otp);
 
       otpStore.set(email, {
@@ -148,7 +148,7 @@ export class Service {
         expiresAt: Date.now() + 5 * 60 * 1000,
       });
 
-      const defaultEmail = "albertjpaul@gmail.com";
+      const defaultEmail = email;
       await sendOtp(defaultEmail, otp);
 
       return { success: true };
@@ -242,6 +242,7 @@ export class Service {
   };
 
   editImage = async (imageId: string, title: string) => {
+    
     this._repository.imageEdit(imageId, title);
     return true;
   };
