@@ -71,6 +71,10 @@ const Login = () => {
       required
     />
 
+    <p onClick={() => navigate("/forgotPassword")}>
+      <span>forgot password</span>
+    </p>
+
     <button type="submit" disabled={loading}>
       {loading ? "loggin in..." : "Login"}
     </button>

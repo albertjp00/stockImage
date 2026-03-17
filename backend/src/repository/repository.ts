@@ -23,6 +23,10 @@ export class Repository {
     }
   };
 
+    async changePassword(id: string, password: string) {
+    return await UserModel.findByIdAndUpdate(id, { password: password });
+  }
+
   addImage = async (id: string , title: string, image: string , order : number) => {
     try {        
       const user = await ImageModel.create({ userId : id , title:title  , image:image , order : order });

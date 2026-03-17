@@ -1,36 +1,35 @@
-import express from "express"
+import express from "express";
 import { Controller } from "../controller/controller";
-import multer from 'multer'
+import multer from "multer";
 import { authMiddleware } from "../middleware/authMiddleware";
+import { upload } from "../utils/multer";
 
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null,'src/assets');
-  },
-  filename: function (req, file, cb) {
-    cb(null,file.originalname);
-  },
-});
 
-const upload = multer({storage})
 
 const router = express.Router();
 
-const controller = new Controller
+const controller = new Controller();
 
-router.post('/register',authMiddleware , controller.register)
+router.post("/register",  controller.register);
 
-router.post('/login',controller.login)
+router.post("/login", controller.login);
 
-router.post('/addImage',upload.array('images'),authMiddleware , controller.addImage)
+router.post("/verifyOtp", controller.verifyOtp);
 
-router.get('/getImages/:page',authMiddleware,controller.getImages)
+router.post("/resendOtp", controller.resendOtp);
 
-router.post('/changeOrder',authMiddleware,controller.changeOrder)
+router.post("/forgotPassword", controller.forgotPassword);
 
-router.delete('/deleteImage/:id',authMiddleware,controller.deleteImage)
+router.post("/resetPassword", controller.resetPassword);
 
-router.put('/imageEdit/:id',authMiddleware,controller.editImage)
+router.post("/image",authMiddleware,upload.array("images"),controller.addImage,);
 
+router.get("/image/:page", authMiddleware, controller.getImages);
 
-export default router
+router.post("/changeOrder", authMiddleware, controller.changeOrder);
+
+router.delete("/image/:id", authMiddleware, controller.deleteImage);
+
+router.put("/imageEdit/:id", authMiddleware, controller.editImage);
+
+export default router;

@@ -37,7 +37,7 @@ export const  logoutUser = async()=>{
 
 export const  addImage = async(formData : FormData)=>{
     try {
-        const res  = await api.post("/addImage",formData ,{
+        const res  = await api.post("/image",formData ,{
             headers :{
                 "Content-Type " : "multipart/form-data"
             },
@@ -52,7 +52,7 @@ export const  addImage = async(formData : FormData)=>{
 
 export const  getImages = async(page : number)=>{
     try {
-        const res  = await api.get(`/getImages/${page}`)
+        const res  = await api.get(`/image/${page}`)
         return res
     } catch (error) {
         console.log(error);
@@ -78,9 +78,65 @@ export const  changeOrder = async(reordered:{id : string , order : number}[])=>{
 
 
 export const deleteImage = (id: string) => {
-  return api.delete(`/deleteImage/${id}`);
+  return api.delete(`/image/${id}`);
 };
 
 export const editImage = (id: string, title: string) => {
   return api.put(`/imageEdit/${id}`, { title });
 };
+
+
+export const  verifyOtp = async(otp : string , email : string)=>{
+    // eslint-disable-next-line no-useless-catch
+    try {
+        const res  = await api.post(`/verifyOtp`,{otp , email})
+        return res
+    } catch (error) {   
+        throw error
+    }
+}
+
+export const  resendOtp = async(email:string)=>{
+    try {
+        
+        const res  = await api.post(`/resendOtp`,{email})
+        return res
+    } catch (error) {   
+        console.log(error);
+        throw error
+    }
+}
+
+
+export const  forgotPassword = async(email:string)=>{
+    try {
+        
+        const res  = await api.post(`/forgotPassword`,{email})
+        return res
+    } catch (error) {   
+        console.log(error);
+        throw error
+    }
+}
+
+export const  resetPassword = async(email:string , newPassword : string)=>{
+    try {
+        
+        const res  = await api.post(`/resetPassword`,{email , newPassword})
+        return res
+    } catch (error) {   
+        console.log(error);
+        throw error
+    }
+}
+
+
+export const  verifyResetOtp = async(otp : string , email : string)=>{
+    // eslint-disable-next-line no-useless-catch
+    try {
+        const res  = await api.post(`/verifyResetOtp`,{otp , email})
+        return res
+    } catch (error) {   
+        throw error
+    }
+}

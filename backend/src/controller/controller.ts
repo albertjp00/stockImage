@@ -1,3 +1,4 @@
+import { AddImageDto, LoginDto, RegisterDto, ResetPasswordDto, VerifyOtpDto } from "../dto/dto";
 import { AuthRequest } from "../middleware/authMiddleware";
 import { Service } from "../services/service";
 import { Request, Response } from "express";
@@ -7,8 +8,11 @@ export class Controller {
 
   login = async (req: Request, res: Response) => {
     try {
-      const { email, password } = req.body;
-      const result = await this._service.loginRequest(email, password);
+      const dto: LoginDto = {
+      email: req.body.email,
+      password: req.body.password
+    };
+      const result = await this._service.loginRequest(dto);
       if (!result) return;
       if (result.success) {
         res.status(200).json({ success: true, token: result.token });
@@ -23,15 +27,17 @@ export class Controller {
 
   register = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { name, phone, email, password } = req.body;
-      console.log(name, email, password, phone);
+      const dto: RegisterDto = {
+      name: req.body.name,
+      phone: req.body.phone,
+      email: req.body.email,
+      password: req.body.password
+    };
 
-      const result = await this._service.registerRequest(
-        name,
-        phone,
-        email,
-        password,
-      );
+      const result = await this._service.registerRequest(dto);
+
+      console.log('register',result);
+      
 
       if (!result?.success) {
         res.json({ success: false, message: result?.message });
@@ -47,18 +53,83 @@ export class Controller {
     }
   };
 
+  verifyOtp = async (req: Request, res: Response) => {
+    try {
+      const dto: VerifyOtpDto = {
+      email: req.body.email,
+      otp: req.body.otp
+    };
+      const result = await this._service.verifyOtp(dto);
+      console.log('result ',result);
+      
+      if (result?.success) {
+        res.status(200).json({ success: true });
+      } else {
+        res.status(400).json({ success: false, message: result?.message });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+    resendOtp = async (req: Request, res: Response) => {
+    try {
+      const {  email } = req.body;
+
+      const result = await this._service.resendOtp(email);
+      console.log('result ',result);
+      
+      if (result?.success) {
+        res.status(200).json({ success: true });
+      } else {
+        res.status(400).json({ success: false });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+      forgotPassword = async (req: Request, res: Response) => {
+    try {
+      const {  email } = req.body;
+
+      const result = await this._service.forgotPassword(email);
+      console.log('result ',result);
+      
+      if (result?.success) {
+        res.status(200).json({ success: true });
+      } else {
+        res.status(400).json({ success: false , message : result?.message });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  resetPassword = async (req: Request, res: Response) => {
+    try {
+      const dto: ResetPasswordDto = {
+      email: req.body.email,
+      newPassword: req.body.newPassword
+    };
+
+      const result = await this._service.resetPassword(dto);
+     res.json({success : true})
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
 addImage = async (req: AuthRequest, res: Response) => {
   try {
 
-    const id = req.user?.id;
-    const titles = req.body.titles;
-    const files = req.files as Express.Multer.File[];
+    const dto: AddImageDto = {
+      userId: req.user?.id as string,
+      titles: req.body.titles,
+      files: req.files as Express.Multer.File[]
+    };
 
-    const result = await this._service.addImage(
-      id as string,
-      titles,
-      files
-    );
+    const result = await this._service.addImage(dto);
 
     res.json(result);
 

@@ -9,6 +9,7 @@ import {
 } from "../../assets/services/services";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import type { DropResult } from "@hello-pangea/dnd";
+import { toast } from "react-hot-toast";
 
 export interface ImageItem {
   _id: string;
@@ -28,7 +29,7 @@ const ImageGallery: React.FC = () => {
   const [editId, setEditId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState("");
   const [deleteId, setDeleteId] = useState<string | null>(null);
-const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = e.target.files ? Array.from(e.target.files) : [];
@@ -147,9 +148,8 @@ const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     }));
 
     await changeOrder(reordered);
+    toast.success("order saved");
   };
-
-
 
   const handleSaveEdit = async () => {
     if (!editId) return;
@@ -178,24 +178,24 @@ const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   };
 
   const openDeleteModal = (id: string) => {
-  setDeleteId(id);
-  setIsDeleteModalOpen(true);
-};
+    setDeleteId(id);
+    setIsDeleteModalOpen(true);
+  };
 
-const closeDeleteModal = () => {
-  setDeleteId(null);
-  setIsDeleteModalOpen(false);
-};
+  const closeDeleteModal = () => {
+    setDeleteId(null);
+    setIsDeleteModalOpen(false);
+  };
 
-const confirmDelete = async () => {
-  if (!deleteId) return;
+  const confirmDelete = async () => {
+    if (!deleteId) return;
 
-  await deleteImage(deleteId);
+    await deleteImage(deleteId);
 
-  setImages((prev) => prev.filter((img) => img._id !== deleteId));
+    setImages((prev) => prev.filter((img) => img._id !== deleteId));
 
-  closeDeleteModal();
-};
+    closeDeleteModal();
+  };
 
   return (
     <div className="gallery-container">
@@ -264,7 +264,9 @@ const confirmDelete = async () => {
                           <button onClick={() => openEditModal(img)}>
                             Edit
                           </button>
-                          <button onClick={() => openDeleteModal(img._id)}>Delete</button>
+                          <button onClick={() => openDeleteModal(img._id)}>
+                            Delete
+                          </button>
                         </div>
                       </div>
                     )}
@@ -305,12 +307,12 @@ const confirmDelete = async () => {
             />
 
             <div className="modal-actions">
-              <button className="save-btn" onClick={handleSaveEdit}>
-                Save
-              </button>
-
               <button className="cancel-btn" onClick={closeModal}>
                 Cancel
+              </button>
+
+              <button className="save-btn" onClick={handleSaveEdit}>
+                Save
               </button>
             </div>
           </div>
@@ -318,23 +320,23 @@ const confirmDelete = async () => {
       )}
 
       {isDeleteModalOpen && (
-  <div className="modal-overlay">
-    <div className="modal-box">
-      <h3>Delete Image</h3>
-      <p>Are you sure you want to delete this image?</p>
+        <div className="modal-overlay">
+          <div className="modal-box">
+            <h3>Delete Image</h3>
+            <p>Are you sure you want to delete this image?</p>
 
-      <div className="modal-actions">
-        <button className="delete-btn" onClick={confirmDelete}>
-          Delete
-        </button>
+            <div className="modal-actions">
+              <button className="cancel-btn" onClick={closeDeleteModal}>
+                Cancel
+              </button>
 
-        <button className="cancel-btn" onClick={closeDeleteModal}>
-          Cancel
-        </button>
-      </div>
-    </div>
-  </div>
-)}
+              <button className="delete-btn" onClick={confirmDelete}>
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -36,7 +36,7 @@ const Register = () => {
       if(res?.data.success){
       toast.success(res?.data.message);
       
-      navigate("/login");
+      navigate("/verifyOtp", { state: { email: formData.email } });
       }else{
         toast.error(res?.data.message)
       }
