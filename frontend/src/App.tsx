@@ -9,6 +9,7 @@ import ForgotPassword from "./components/resetPassword/forgotPassword";
 import ResetPassword from "./components/resetPassword/resetPassword";
 import VerifyResetOtpPassword from "./components/resetPassword/verifyResetPassOtp";
 import { Toaster } from "react-hot-toast";
+import PublicRoute from "./components/protectedRoute/protectedRoute";
 
 function App() {
   return (
@@ -17,13 +18,13 @@ function App() {
       <Toaster position="top-center" />
 
       <Routes>
-        <Route path="/register" element={<Register />} />
-        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
+        <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
         <Route path="/home" element={<Home />} />
-        <Route path="/verifyOtp" element={<VerifyOtp />} />
-        <Route path="/forgotPassword" element={<ForgotPassword />} />
-        <Route path="/resetPassword" element={<ResetPassword />} />
-        <Route path="/verifyresetPasswordOtp" element={<VerifyResetOtpPassword />} />
+        <Route path="/verifyOtp" element={<PublicRoute><VerifyOtp /></PublicRoute>} />
+        <Route path="/forgotPassword" element={<PublicRoute><ForgotPassword /></PublicRoute>} />
+        <Route path="/resetPassword" element={<PublicRoute><ResetPassword /></PublicRoute>} />
+        <Route path="/verifyresetPasswordOtp" element={<PublicRoute><VerifyResetOtpPassword /></PublicRoute>} />
       </Routes>
     </BrowserRouter>
   );
