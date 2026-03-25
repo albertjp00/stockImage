@@ -30,6 +30,6 @@ router.post("/changeOrder", authMiddleware, controller.changeOrder);
 
 router.delete("/image/:id", authMiddleware, controller.deleteImage);
 
-router.put("/imageEdit/:id", authMiddleware, controller.editImage);
+router.put("/image/:id", authMiddleware, controller.editImage);
 
 export default router;

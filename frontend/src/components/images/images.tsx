@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import "./images.css";
 import {
   addImage,
   changeOrder,
@@ -30,6 +29,7 @@ const ImageGallery: React.FC = () => {
   const [editTitle, setEditTitle] = useState("");
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [loading , setLoading] = useState(true)
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = e.target.files ? Array.from(e.target.files) : [];
@@ -59,7 +59,8 @@ const ImageGallery: React.FC = () => {
   };
 
   const handleUpload = async () => {
-    if (titles.some((t) => !t.trim())) {
+    try {
+      if (titles.some((t) => !t.trim())) {
       setError("All images must have a title");
       return;
     }
@@ -106,7 +107,12 @@ const ImageGallery: React.FC = () => {
     setImages((prev) => [...prev, ...formattedImages]);
     setFiles([]);
     setTitles([]);
+    } catch (error) {
+      console.log(error);
+    }
   };
+
+  
 
   const handleDragEnd = (result: DropResult) => {
     if (!result.destination) return;
@@ -130,6 +136,8 @@ const ImageGallery: React.FC = () => {
         }
       } catch (error) {
         console.log(error);
+      }finally{
+        setLoading(false)
       }
     };
     fetchImages(page);
@@ -198,75 +206,106 @@ const ImageGallery: React.FC = () => {
     setIsDeleteModalOpen(false);
   };
 
-const confirmDelete = async () => {
-  if (!deleteId) return;
+  const confirmDelete = async () => {
+    if (!deleteId) return;
 
-  try {
-    const res = await deleteImage(deleteId);
+    try {
+      const res = await deleteImage(deleteId);
 
-    if (!res.data.success) {
-      toast.error(res.data.message);
-      return;
+      if (!res.data.success) {
+        toast.error(res.data.message);
+        return;
+      }
+
+      setImages((prev) => prev.filter((img) => img._id !== deleteId));
+
+      toast.success("Image deleted");
+      closeDeleteModal();
+    } catch (err) {
+      console.log(err);
+      toast.error("Delete failed");
     }
+  };
 
-    setImages((prev) => prev.filter((img) => img._id !== deleteId));
-
-    toast.success("Image deleted");
-    closeDeleteModal();
-  } catch (err) {
-    console.log(err);
-    toast.error("Delete failed");
-  }
-};
+  if(loading){
+    return (
+    <div className="flex items-center justify-center h-screen">
+      <div className="w-10 h-10 border-4 border-gray-300 border-t-blue-500 rounded-full animate-spin"></div>
+    </div>
+  );
+  }else{
 
   return (
-    <div className="gallery-container">
-      <div className="gallery-header">
-        <h2>My Images</h2>
-        <button className="img-grid-btn" onClick={saveOrder}>
-          Save Order
-        </button>
 
-        {files.length === 0 ? (
-          <label className="upload-btn">
-            + Add Images
-            <input type="file" multiple onChange={handleFileChange} hidden />
-          </label>
-        ) : (
+    
+    <div className="p-6 max-w-6xl mx-auto">
+      
+      {/* Header */}
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-bold">My Images</h2>
+
+        <div className="flex gap-3">
           <button
-            className="upload-btn cancel-btn"
-            onClick={handleCancelUpload}
+            onClick={saveOrder}
+            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg"
           >
-            Cancel
+            Save Order
           </button>
-        )}
+
+          {files.length === 0 ? (
+            <label className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg cursor-pointer">
+              + Add Images
+              <input type="file" multiple onChange={handleFileChange} hidden />
+            </label>
+          ) : (
+            <button
+              onClick={handleCancelUpload}
+              className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg"
+            >
+              Cancel
+            </button>
+          )}
+        </div>
       </div>
 
+      {/* Upload Section */}
       {files.length > 0 && (
-        <div className="upload-section">
-          {/* <p>Cancel</p> */}
+        <div className="bg-gray-100 p-4 rounded-lg mb-6 space-y-3">
           {files.map((file, index) => (
-            <div key={index} className="upload-item">
-              <p>{file.name}</p>
+            <div key={index} className="flex gap-3 items-center">
+              <p className="w-40 truncate">{file.name}</p>
 
               <input
                 type="text"
                 placeholder="Enter image title"
                 value={titles[index]}
                 onChange={(e) => handleTitleChange(index, e.target.value)}
+                className="border px-3 py-2 rounded-lg w-full"
               />
             </div>
           ))}
-          {error && <p className="error">{error}</p>}
-          <button onClick={handleUpload}>Upload</button>
+
+          {error && <p className="text-red-500">{error}</p>}
+
+          <button
+            onClick={handleUpload}
+            className="bg-black text-white px-4 py-2 rounded-lg"
+          >
+            Upload
+          </button>
         </div>
       )}
 
-      <div className="image-grid">
+      {/* Image Grid */}
+      <div className="mt-6">
         <DragDropContext onDragEnd={handleDragEnd}>
           <Droppable droppableId="images">
             {(provided) => (
-              <div ref={provided.innerRef} {...provided.droppableProps}>
+              <div
+                ref={provided.innerRef}
+                {...provided.droppableProps}
+                className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
+              >
                 {images.map((img, index) => (
                   <Draggable key={img._id} draggableId={img._id} index={index}>
                     {(provided) => (
@@ -274,19 +313,29 @@ const confirmDelete = async () => {
                         ref={provided.innerRef}
                         {...provided.draggableProps}
                         {...provided.dragHandleProps}
+                        className="bg-white shadow-md rounded-xl overflow-hidden p-2"
                       >
                         <img
-                          className="img"
                           src={`${import.meta.env.VITE_API_URL}/assets/${img.image}`}
+                          className="w-full h-40 object-cover rounded-md"
                         />
 
-                        <p>{img.title}</p>
+                        <p className="mt-2 font-medium text-center">
+                          {img.title}
+                        </p>
 
-                        <div className="img-actions">
-                          <button onClick={() => openEditModal(img)}>
+                        <div className="flex justify-center gap-2 mt-3">
+                          <button
+                            onClick={() => openEditModal(img)}
+                            className="bg-yellow-400 hover:bg-yellow-500 px-3 py-1 rounded"
+                          >
                             Edit
                           </button>
-                          <button onClick={() => openDeleteModal(img._id)}>
+
+                          <button
+                            onClick={() => openDeleteModal(img._id)}
+                            className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"
+                          >
                             Delete
                           </button>
                         </div>
@@ -300,40 +349,55 @@ const confirmDelete = async () => {
           </Droppable>
         </DragDropContext>
       </div>
-      <div className="pagination">
-        <button onClick={() => setPage(page - 1)} disabled={page === 1}>
+
+      {/* Pagination */}
+      <div className="flex justify-center items-center gap-4 mt-6">
+        <button
+          onClick={() => setPage(page - 1)}
+          disabled={page === 1}
+          className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
+        >
           Prev
         </button>
 
-        <span>
+        <span className="font-medium">
           Page {page} of {totalPages}
         </span>
 
         <button
           onClick={() => setPage(page + 1)}
           disabled={page === totalPages}
+          className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
         >
           Next
         </button>
       </div>
 
+      {/* Edit Modal */}
       {isModalOpen && (
-        <div className="modal-overlay">
-          <div className="modal-box">
-            <h3>Edit Image Title</h3>
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center">
+          <div className="bg-white p-6 rounded-xl w-80">
+            <h3 className="text-lg font-semibold mb-4">Edit Image Title</h3>
 
             <input
               type="text"
               value={editTitle}
               onChange={(e) => setEditTitle(e.target.value)}
+              className="border w-full px-3 py-2 rounded mb-4"
             />
 
-            <div className="modal-actions">
-              <button className="cancel-btn" onClick={closeModal}>
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={closeModal}
+                className="px-3 py-2 bg-gray-300 rounded"
+              >
                 Cancel
               </button>
 
-              <button className="save-btn" onClick={handleSaveEdit}>
+              <button
+                onClick={handleSaveEdit}
+                className="px-3 py-2 bg-blue-500 text-white rounded"
+              >
                 Save
               </button>
             </div>
@@ -341,18 +405,25 @@ const confirmDelete = async () => {
         </div>
       )}
 
+      {/* Delete Modal */}
       {isDeleteModalOpen && (
-        <div className="modal-overlay">
-          <div className="modal-box">
-            <h3>Delete Image</h3>
-            <p>Are you sure you want to delete this image?</p>
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center">
+          <div className="bg-white p-6 rounded-xl w-80">
+            <h3 className="text-lg font-semibold mb-2">Delete Image</h3>
+            <p className="mb-4">Are you sure you want to delete this image?</p>
 
-            <div className="modal-actions">
-              <button className="cancel-btn" onClick={closeDeleteModal}>
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={closeDeleteModal}
+                className="px-3 py-2 bg-gray-300 rounded"
+              >
                 Cancel
               </button>
 
-              <button className="delete-btn" onClick={confirmDelete}>
+              <button
+                onClick={confirmDelete}
+                className="px-3 py-2 bg-red-500 text-white rounded"
+              >
                 Delete
               </button>
             </div>
@@ -361,6 +432,7 @@ const confirmDelete = async () => {
       )}
     </div>
   );
+}
 };
 
 export default ImageGallery;

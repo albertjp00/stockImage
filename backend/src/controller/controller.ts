@@ -1,4 +1,5 @@
 import { AddImageDto, LoginDto, RegisterDto, ResetPasswordDto, VerifyOtpDto } from "../dto/dto";
+import { HttpStatus } from "../enums/httpStatus.enums";
 import { AuthRequest } from "../middleware/authMiddleware";
 import { Service } from "../services/service";
 import { Request, Response } from "express";
@@ -15,7 +16,7 @@ export class Controller {
       const result = await this._service.loginRequest(dto);
       if (!result) return;
       if (result.success) {
-        res.status(200).json({ success: true, token: result.token });
+        res.status(HttpStatus.OK).json({ success: true, token: result.token });
         return;
       }
 
@@ -43,7 +44,7 @@ export class Controller {
         res.json({ success: false, message: result?.message });
       }
 
-      res.status(200).json({ success: true });
+      res.status(HttpStatus.OK).json({ success: true });
     } catch (error) {
       console.log(error);
       res.status(500).json({
@@ -63,9 +64,9 @@ export class Controller {
       console.log('result ',result);
       
       if (result?.success) {
-        res.status(200).json({ success: true });
+        res.status(HttpStatus.OK).json({ success: true });
       } else {
-        res.status(400).json({ success: false, message: result?.message });
+        res.status(HttpStatus.BAD_REQUEST).json({ success: false, message: result?.message });
       }
     } catch (error) {
       console.log(error);
@@ -80,9 +81,9 @@ export class Controller {
       console.log('result ',result);
       
       if (result?.success) {
-        res.status(200).json({ success: true });
+        res.status(HttpStatus.OK).json({ success: true });
       } else {
-        res.status(400).json({ success: false });
+        res.status(HttpStatus.BAD_REQUEST).json({ success: false });
       }
     } catch (error) {
       console.log(error);
@@ -97,9 +98,9 @@ export class Controller {
       console.log('result ',result);
       
       if (result?.success) {
-        res.status(200).json({ success: true });
+        res.status(HttpStatus.OK).json({ success: true });
       } else {
-        res.status(400).json({ success: false , message : result?.message });
+        res.status(HttpStatus.BAD_REQUEST).json({ success: false , message : result?.message });
       }
     } catch (error) {
       console.log(error);
@@ -135,7 +136,7 @@ addImage = async (req: AuthRequest, res: Response) => {
 
   } catch (error) {
     console.log(error);
-    res.status(500).json({ success: false, message: "Upload failed" });
+    res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ success: false, message: "Upload failed" });
   }
 };
 
